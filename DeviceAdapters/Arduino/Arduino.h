@@ -31,6 +31,8 @@
 #define ERR_BOARD_NOT_FOUND 105
 #define ERR_PORT_OPEN_FAILED 106
 #define ERR_COMMUNICATION 107
+#define ERR_COMMUNICATION_2 110
+#define ERR_COMMUNICATION_3 111
 #define ERR_NO_PORT_SET 108
 #define ERR_VERSION_MISMATCH 109
 
@@ -150,9 +152,10 @@ public:
    int OnBlankingTriggerDirection(MM::PropertyBase* pProp, MM::ActionType eAct);
 
    int OnSequence(MM::PropertyBase* pProp, MM::ActionType eAct);
+   int OnDim(MM::PropertyBase* pProp, MM::ActionType eAct);
 
 private:
-   static const unsigned int NUMPATTERNS = 12;
+   static const unsigned int NUMPATTERNS = 100;
 
    int OpenPort(const char* pszName, long lnValue);
    int WriteToPort(long lnValue);
@@ -168,6 +171,7 @@ private:
    bool initialized_;
    long numPos_;
    bool busy_;
+   int LED1_intensity_;
 };
 
 class CArduinoDA : public CSignalIOBase<CArduinoDA>  

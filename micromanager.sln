@@ -458,6 +458,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SigmaKoki", "DeviceAdapters
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Pixelink", "DeviceAdapters\Pixelink\Pixelink.vcxproj", "{899D6AEF-6BC3-4203-B566-4EA4B52D1E80}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Arduino_skedit", "DeviceAdapters\ardunino_sk_testing\ardunino_sk_testing.vcxproj", "{7DECC40E-BD48-4FB6-9C22-5CBDF7252F8F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -1376,6 +1378,10 @@ Global
 		{899D6AEF-6BC3-4203-B566-4EA4B52D1E80}.Debug|x64.Build.0 = Debug|x64
 		{899D6AEF-6BC3-4203-B566-4EA4B52D1E80}.Release|x64.ActiveCfg = Release|x64
 		{899D6AEF-6BC3-4203-B566-4EA4B52D1E80}.Release|x64.Build.0 = Release|x64
+		{7DECC40E-BD48-4FB6-9C22-5CBDF7252F8F}.Debug|x64.ActiveCfg = Debug|x64
+		{7DECC40E-BD48-4FB6-9C22-5CBDF7252F8F}.Debug|x64.Build.0 = Debug|x64
+		{7DECC40E-BD48-4FB6-9C22-5CBDF7252F8F}.Release|x64.ActiveCfg = Release|x64
+		{7DECC40E-BD48-4FB6-9C22-5CBDF7252F8F}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -373,7 +373,8 @@ CArduinoSwitch::CArduinoSwitch() :
    blanking_(false),
    initialized_(false),
    numPos_(64), 
-   busy_(false)
+   busy_(false),
+   LED1_intensity_(10)
 {
    InitializeDefaultErrorMessages();
 
@@ -383,6 +384,8 @@ CArduinoSwitch::CArduinoSwitch() :
    SetErrorText(ERR_WRITE_FAILED, "Failed to write data to the device");
    SetErrorText(ERR_CLOSE_FAILED, "Failed closing the device");
    SetErrorText(ERR_COMMUNICATION, "Error in communication with Arduino board");
+   SetErrorText(ERR_COMMUNICATION_2, "Error in communication with Arduino board_2");
+   SetErrorText(ERR_COMMUNICATION_3, "Error in communication with Arduino board_2");
    SetErrorText(ERR_NO_PORT_SET, "Hub Device not found.  The Arduino Hub device is needed to create this device");
 
    for (unsigned int i=0; i < NUMPATTERNS; i++)
@@ -472,6 +475,18 @@ int CArduinoSwitch::Initialize()
       return nRet;
    AddAllowedValue("Blank On", "Low");
    AddAllowedValue("Blank On", "High");
+
+   //svilen derick edit LED_dimming1
+   pAct = new CPropertyAction(this, &CArduinoSwitch::OnDim);
+   nRet = CreateProperty("LED_1_dim", g_On, MM::Integer, false, pAct);
+   if (nRet != DEVICE_OK)
+       return nRet;
+   SetPropertyLimits("LED_1_dim", 0, 100);
+
+   pAct = new CPropertyAction(this, &CArduinoSwitch::OnDim);
+   nRet = CreateProperty("LED_1_dim", "0", MM::Integer, false, pAct);
+   SetPropertyLimits("LED_1_dim", 0, 100);
+   UpdateProperty("LED_1_dim");
 
    /*
    // Starts producing timed digital output patterns 
@@ -591,7 +606,7 @@ int CArduinoSwitch::LoadSequence(unsigned size, unsigned char* seq)
       bytesRead += br;
       }
       if (answer[0] != 5)
-         return ERR_COMMUNICATION;
+         return ERR_COMMUNICATION_2;
 
    }
 
@@ -613,7 +628,7 @@ int CArduinoSwitch::LoadSequence(unsigned size, unsigned char* seq)
       bytesRead += br;
    }
    if (answer[0] != 6)
-      return ERR_COMMUNICATION;
+      return ERR_COMMUNICATION_3;
 
    return DEVICE_OK;
 }
@@ -984,6 +999,85 @@ int CArduinoSwitch::OnRepeatTimedPattern(MM::PropertyBase* pProp, MM::ActionType
 
    return DEVICE_OK;
 }
+
+int CArduinoSwitch::OnDim(MM::PropertyBase* pProp, MM::ActionType eAct)
+/*
+{
+
+    long speed = 0;  // use long type so pProp->Set and pProp->Get work correctly
+    int ret = DEVICE_OK;
+    if (eAct == MM::BeforeGet)
+    {
+        if (initialized_)
+            return DEVICE_OK;  // assume it will only change via this property after initialization
+        ret = g_hub.GetFilterWheelSpeed(*this, *GetCoreCallback(), wheelNr_, speed);
+        if (ret != DEVICE_OK)
+            return ret;
+        pProp->Set(speed);
+    }
+    else if (eAct == MM::AfterSet)
+    {
+        pProp->Get(speed);
+        ret = g_hub.SetFilterWheelSpeed(*this, *GetCoreCallback(), wheelNr_, speed);
+        if (ret != DEVICE_OK)
+            return ret;
+    }
+    return DEVICE_OK;
+}
+*/
+{
+    if (eAct == MM::BeforeGet)
+    {
+        pProp->Set((long int)LED1_intensity_);
+    }
+    else if (eAct == MM::AfterSet)
+    {
+        // edit the arduino switch global var called LED1_intensity_
+        long intensity;
+        pProp->Get(intensity);
+        LED1_intensity_ = intensity;
+
+        // write to the com port to tell the arduino to change LED intensity
+        // check com port available
+        CArduinoHub* hub = static_cast<CArduinoHub*>(GetParentHub());
+        if (!hub || !hub->IsPortAvailable())
+            return ERR_NO_PORT_SET;
+
+        hub->PurgeComPortH();
+
+        // write the command to port
+
+        unsigned char command[3];
+        command[0] = 23;
+        command[1] = 1;
+        command[2] = (unsigned char) intensity;
+
+        //unsigned char command[3];
+        //command[0] = 5;
+        //command[1] = (unsigned char)i;
+        //command[2] = value;
+        int ret = hub->WriteToComPortH((const unsigned char*)command, 3);
+        if (ret != DEVICE_OK)
+            return ret;
+
+        /*
+        MM::MMTime startTime = GetCurrentMMTime();
+        unsigned long bytesRead = 0;
+        unsigned char answer[3];
+        while ((bytesRead < 3) && ((GetCurrentMMTime() - startTime).getMsec() < 250)) {
+            unsigned long br;
+            ret = hub->ReadFromComPortH(answer + bytesRead, 3, br);
+            if (ret != DEVICE_OK)
+                return ret;
+            bytesRead += br;
+        }
+        if (answer[0] != 23)
+            return ERR_COMMUNICATION_2;
+        */
+    }
+    return DEVICE_OK;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // CArduinoDA implementation
